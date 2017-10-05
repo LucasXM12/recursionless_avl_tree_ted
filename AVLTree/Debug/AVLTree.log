@@ -1,0 +1,4 @@
+﻿  Tree.cpp
+AVLTree.obj : error LNK2019: unresolved external symbol "public: __thiscall Tree<int>::Tree<int>(void)" (??0?$Tree@H@@QAE@XZ) referenced in function _main
+AVLTree.obj : error LNK2019: unresolved external symbol "public: virtual __thiscall Tree<int>::~Tree<int>(void)" (??1?$Tree@H@@UAE@XZ) referenced in function _main
+F:\PD\TED\avl_tree_ted\AVLTree\Debug\AVLTree.exe : fatal error LNK1120: 2 unresolved externals

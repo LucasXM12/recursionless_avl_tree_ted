@@ -1,0 +1,6 @@
+﻿  AVLTree.cpp
+f:\pd\ted\avl_tree_ted\avltree\tree.h(213): warning C4172: returning address of local variable or temporary: ret
+f:\pd\ted\avl_tree_ted\avltree\tree.h(184): warning C4172: returning address of local variable or temporary: y
+f:\pd\ted\avl_tree_ted\avltree\tree.h(200): warning C4172: returning address of local variable or temporary: x
+  AVLTree.vcxproj -> F:\PD\TED\avl_tree_ted\AVLTree\x64\Debug\AVLTree.exe
+  AVLTree.vcxproj -> F:\PD\TED\avl_tree_ted\AVLTree\x64\Debug\AVLTree.pdb (Full PDB)
