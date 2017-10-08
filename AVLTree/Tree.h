@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 
+#include <stack>
 #include <string>
 #include <stdexcept>
 
@@ -31,9 +32,11 @@ private:
 
 	node* root;
 
+	stack<void*> callStack;
+
 	void delTree(node*&);
 
-	string toString(const node*&) const;
+	string toString(node*);
 
 	node*& minKey(node*&) const;
 	node*& maxKey(node*&) const;
@@ -54,7 +57,7 @@ public:
 	Tree();
 	virtual ~Tree();
 
-	string toString() const;
+	string toString();
 
 	void addNode(const int&, const dataType&);
 	void delWithKey(const int&);
@@ -96,7 +99,7 @@ void Tree<dataType>::delTree(node*& root) {
 }
 
 template<class dataType>
-string Tree<dataType>::toString() const {
+string Tree<dataType>::toString() {
 	if (!this->root)
 		return "null";
 
@@ -104,18 +107,96 @@ string Tree<dataType>::toString() const {
 }
 
 template<class dataType>
-string Tree<dataType>::toString(const node*& root) const {
-	string ret;
+string Tree<dataType>::toString(node* root) {
+begin:
+	string* aux = NULL;
+	unsigned char* instP = NULL;
 
-	if (root->left)
-		ret = "(" + toString(root->left) + ")<-";
+	//if (root->left) {
+	if (!root->left) {
+		goto P2;
+	}
 
-	ret += "[" + to_string(root->key) + ':' + to_string(root->data) + "]";
+	if (!aux || (*aux).empty())
+		aux = new string();
 
-	if (root->right)
-		ret += "->(" + toString(root->right) + ")";
+	*aux += "(";
 
-	return ret;
+	this->callStack.push(root);
+	this->callStack.push(aux);
+
+	instP = new unsigned char();
+	*instP = 1;
+	this->callStack.push(instP);
+
+	root = root->left;
+
+	goto begin;
+
+P1:
+	aux = (string*) this->callStack.top();
+	this->callStack.pop();
+	*aux = *(string*)this->callStack.top() + *aux;
+	this->callStack.pop();
+	root = (node*)this->callStack.top();
+	this->callStack.pop();
+
+	*aux += ")<-";
+	//}
+P2:
+
+	if (!aux || (*aux).empty())
+		aux = new string();
+
+	*aux += "|" + to_string(root->key) + ':' + to_string(root->data) + "|";
+
+	//if (root->right) {
+	if (!root->right) {
+		goto P4;
+	}
+
+	if (!aux || (*aux).empty())
+		aux = new string();
+
+	*aux += "->(";
+
+	this->callStack.push(root);
+	this->callStack.push(aux);
+
+	instP = new unsigned char();
+	*instP = 3;
+	this->callStack.push(instP);
+
+	root = root->right;
+
+	goto begin;
+
+P3:
+	aux = (string*) this->callStack.top();
+	this->callStack.pop();
+	*aux = *(string*)this->callStack.top() + *aux;
+	this->callStack.pop();
+	root = (node*)this->callStack.top();
+	this->callStack.pop();
+
+	*aux += ")";
+	//}
+P4:
+
+	if (this->callStack.empty())
+		return *aux;
+	else {
+		unsigned char backP = *(unsigned char*)this->callStack.top();
+		this->callStack.pop();
+		this->callStack.push(aux);
+
+		switch (backP) {
+		case 1:
+			goto P1;
+		case 3:
+			goto P3;
+		}
+	}
 }
 
 template<class dataType>
@@ -284,11 +365,13 @@ typename Tree<dataType>::node* Tree<dataType>::delWithKey(node*& root, const int
 			if (!aux) {
 				aux = root;
 				root = NULL;
-			} else //One child:
+			}
+			else //One child:
 				*root = *aux;
 
 			delete aux;
-		} else { //Two children:
+		}
+		else { //Two children:
 			node* aux = minKey(root->right);
 
 			root->key = aux->key;
@@ -389,7 +472,7 @@ void Tree<dataType>::setWithKey(node*& root, const int& key, const dataType& dat
 }
 
 template<typename dataType>
-ostream& operator<<(ostream& os, const Tree<dataType>& tree) {
+ostream& operator<<(ostream& os, Tree<dataType>& tree) {
 	return os << tree.toString();
 }
 
