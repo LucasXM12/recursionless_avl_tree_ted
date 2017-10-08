@@ -38,7 +38,7 @@ private:
 
 	string toString(node*);
 
-	int minKey(node* const&) const;
+	node* minKey(node* const&) const;
 	int maxKey(node* const&) const;
 
 	node*& leftRotate(node*&);
@@ -47,9 +47,10 @@ private:
 	node*& newNode(const int&, const dataType&) const;
 
 	node*& addNode(node*&, const int&, const dataType&);
-	node* delWithKey(node*&, const int&);
+	node* delWlthKey(node*, int);
 
 	bool existsKey(const int&, node* const&) const;
+	node* delWithKey(node*&, const int&);
 
 public:
 	Tree();
@@ -59,6 +60,7 @@ public:
 
 	void addNode(const int&, const dataType&);
 	void delWithKey(const int&);
+	void delWlthKey(const int&);
 
 	int minKey() const;
 	int maxKey() const;
@@ -199,16 +201,16 @@ typename int Tree<dataType>::minKey() const {
 	if (!this->root)
 		throw exception("Empty tree");
 
-	return minKey(this->root);
+	return minKey(this->root)->key;
 }
 
 template<class dataType>
-typename int Tree<dataType>::minKey(node* const& root) const {
+typename Tree<dataType>::node* Tree<dataType>::minKey(node* const& root) const {
 	node* aux = root;
 	while (aux->left)
 		aux = aux->left;
 
-	return aux->key;
+	return aux;
 }
 
 template<class dataType>
@@ -416,6 +418,159 @@ void Tree<dataType>::delWithKey(const int& key) {
 }
 
 template<typename dataType>
+typename Tree<dataType>::node* Tree<dataType>::delWlthKey(node* root, int key) {
+	int* keyP;
+
+begin:
+	//Normal deletion:---------------------------
+	if (!root) {
+		if (this->callStack.empty())
+			return root;
+		else {
+			this->callStack.push(root);
+
+			goto P1;
+		}
+	}
+
+	this->callStack.push(root);
+	keyP = new int();
+	*keyP = key;
+	this->callStack.push(keyP);
+
+	if (key < root->key) { //The node is on the left sub tree:
+		root = root->left;
+		goto begin;
+	}
+	else if (key > root->key) { //The node is on the right sub tree:
+		root = root->right;
+		goto begin;
+	}
+	else { //The node is the current one:
+		if (!root->left || !root->right) { //One or none children:
+			node* aux = root->left ? root->left : root->right;
+
+			//No child:
+			if (!aux) {
+				aux = root;
+				root = NULL;
+			}
+			else //One child:
+				*root = *aux;
+
+			this->callStack.pop();
+			this->callStack.pop();
+			this->callStack.push(root);
+
+			delete aux;
+		}
+		else { //Two children:
+			node* aux = minKey(root->right);
+
+			root->key = aux->key;
+			root->data = aux->data;
+
+			root = root->right;
+			key = aux->key;
+			goto begin;
+		}
+	}
+
+P1:
+	node* ret = (node*)this->callStack.top();
+	this->callStack.pop();
+	key = *(int*)this->callStack.top();
+	this->callStack.pop();
+	root = (node*)this->callStack.top();
+	this->callStack.pop();
+
+	if (key < root->key)
+		root->left = ret;
+	else
+		root->right = ret;
+
+	if (!root) {
+		if (this->callStack.empty())
+			return NULL;
+		else {
+			this->callStack.push(NULL);
+
+			goto P1;
+		}
+	}
+
+	//Update height:---------------------------
+	root->height = height_update(root);
+
+	//Get balance factor:---------------------------
+	int balance = balance_factor(root);
+
+	//Balance this sub tree:---------------------------
+	//LL Case:
+	if (balance > 1 && balance_factor(root->left) >= 0) {
+		if (this->callStack.empty())
+			return rightRotate(root);
+		else {
+			this->callStack.push(rightRotate(root));
+
+			goto P1;
+		}
+	}
+
+	//LR Case:
+	if (balance > 1 && balance_factor(root->left) < 0) {
+		root->left = leftRotate(root->left);
+
+		if (this->callStack.empty())
+			return rightRotate(root);
+		else {
+			this->callStack.push(rightRotate(root));
+
+			goto P1;
+		}
+	}
+
+	//RR Case:
+	if (balance < -1 && balance_factor(root->right) <= 0) {
+		if (this->callStack.empty())
+			return leftRotate(root);
+		else {
+			this->callStack.push(leftRotate(root));
+
+			goto P1;
+		}
+	}
+
+	//RL Case:
+	if (balance < -1 && balance_factor(root->right) > 0) {
+		root->right = rightRotate(root->right);
+
+
+		if (this->callStack.empty())
+			return leftRotate(root);
+		else {
+			this->callStack.push(leftRotate(root));
+
+			goto P1;
+		}
+	}
+
+	//If is balanced:
+	if (this->callStack.empty())
+		return root;
+	else {
+		this->callStack.push(root);
+
+		goto P1;
+	}
+}
+
+template<typename dataType>
+ostream& operator<<(ostream& os, Tree<dataType>& tree) {
+	return os << tree.toString();
+}
+
+template<typename dataType>
 typename Tree<dataType>::node* Tree<dataType>::delWithKey(node*& root, const int& key) {
 	//Normal deletion:---------------------------
 	if (!root)
@@ -481,11 +636,6 @@ typename Tree<dataType>::node* Tree<dataType>::delWithKey(node*& root, const int
 
 	//If is balanced:
 	return root;
-}
-
-template<typename dataType>
-ostream& operator<<(ostream& os, Tree<dataType>& tree) {
-	return os << tree.toString();
 }
 
 #endif // TREE_H

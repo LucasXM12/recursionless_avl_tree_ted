@@ -12,18 +12,12 @@ using namespace std;
 int main() {
 	Tree<int> aux;
 
-	try {
-		for (int i = 0; i <= 9; i++) {
-			aux.addNode(i, 0);
-			aux.addNode(13 - i, 0);
-			cout << i << " " << 13 - i << endl;
-			cout << aux << endl;
-		}
-	}
-	catch (exception e) {
-	}
+	for (int i = 0; i < 6; i++)
+		aux.addNode(i, 0);
 
-	aux.addNode(20, 0);
+	aux.delWithKey(4);
+	aux.delWithKey(1);
+	aux.delWithKey(3);
 
 	cout << aux << endl;
 	_getch();
