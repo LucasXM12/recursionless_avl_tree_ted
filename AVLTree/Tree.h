@@ -39,6 +39,7 @@ private:
 	string toString(node*);
 
 	int minKey(node* const&) const;
+	int maxKey(node* const&) const;
 
 	node*& leftRotate(node*&);
 	node*& rightRotate(node*&);
@@ -60,6 +61,7 @@ public:
 	void delWithKey(const int&);
 
 	int minKey() const;
+	int maxKey() const;
 
 	bool existsKey(const int&) const;
 
@@ -205,6 +207,23 @@ typename int Tree<dataType>::minKey(node* const& root) const {
 	node* aux = root;
 	while (aux->left)
 		aux = aux->left;
+
+	return aux->key;
+}
+
+template<class dataType>
+typename int Tree<dataType>::maxKey() const {
+	if (!this->root)
+		throw exception("Empty tree");
+
+	return maxKey(this->root);
+}
+
+template<class dataType>
+typename int Tree<dataType>::maxKey(node* const& root) const {
+	node* aux = root;
+	while (aux->right)
+		aux = aux->right;
 
 	return aux->key;
 }
