@@ -38,10 +38,7 @@ private:
 
 	string toString(node*);
 
-	node*& minKey(node*&) const;
-	node*& maxKey(node*&) const;
-
-	bool existsKey(const int&, const node*&) const;
+	int minKey(node* const&) const;
 
 	node*& leftRotate(node*&);
 	node*& rightRotate(node*&);
@@ -50,8 +47,6 @@ private:
 
 	node*& addNode(node*&, const int&, const dataType&);
 	node* delWithKey(node*&, const int&);
-	dataType& getWithKey(node*&, const int&);
-	void setWithKey(node*&, const int&, const dataType&);
 
 public:
 	Tree();
@@ -61,18 +56,9 @@ public:
 
 	void addNode(const int&, const dataType&);
 	void delWithKey(const int&);
-	dataType& getWithKey(const int&);
-	void setWithKey(const int&, const dataType&);
 
 	int minKey() const;
-	int maxKey() const;
 
-	bool existsKey(const int&) const;
-
-	void delMinKey();
-	void delMaxKey();
-
-	dataType& operator[](const int&);
 	template<typename dataType> friend ostream& operator<<(ostream&, const Tree<dataType>&);
 };
 
@@ -197,6 +183,8 @@ P4:
 			goto P3;
 		}
 	}
+
+	return "";
 }
 
 template<class dataType>
@@ -204,49 +192,16 @@ typename int Tree<dataType>::minKey() const {
 	if (!this->root)
 		throw exception("Empty tree");
 
-	return minKey(this->root)->key;
+	return minKey(this->root);
 }
 
 template<class dataType>
-typename Tree<dataType>::node*& Tree<dataType>::minKey(node*& root) const {
-	if (root->left)
-		return minKey(root->left);
+typename int Tree<dataType>::minKey(node* const& root) const {
+	node* aux = root;
+	while (aux->left)
+		aux = aux->left;
 
-	return root;
-}
-
-template<class dataType>
-int Tree<dataType>::maxKey() const {
-	if (!this->root)
-		throw exception("Empty tree");
-
-	return maxKey(this->root)->key;
-}
-
-template<class dataType>
-typename Tree<dataType>::node*& Tree<dataType>::maxKey(node*& root) const {
-	if (root->right != NULL)
-		return maxKey(root->right);
-
-	return root;
-}
-
-template<class dataType>
-bool Tree<dataType>::existsKey(const int& key) const {
-	if (!this->root)
-		return false;
-
-	return existsKey(key, this->root);
-}
-
-template<class dataType>
-bool Tree<dataType>::existsKey(const int& key, const node*& root) const {
-	if (key == root->key)
-		return true;
-	else if (key < root->key)
-		return root->left ? existsKey(key, root->left) : false;
-	else
-		return root->right ? existsKey(key, root->right) : false;
+	return aux->key;
 }
 
 template<typename dataType>
@@ -417,68 +372,8 @@ typename Tree<dataType>::node* Tree<dataType>::delWithKey(node*& root, const int
 }
 
 template<typename dataType>
-void Tree<dataType>::delMinKey() {
-	this->root = delWithKey(this->root, minKey());
-}
-
-template<typename dataType>
-void Tree<dataType>::delMaxKey() {
-	this->root = delWithKey(this->root, maxKey());
-}
-
-template<typename dataType>
-dataType& Tree<dataType>::getWithKey(const int& key) {
-	return getWithKey(this->root, key);
-}
-
-template<typename dataType>
-dataType& Tree<dataType>::getWithKey(node*& root, const int& key) {
-	if (key < root->key)
-		if (root->left)
-			return getWithKey(root->left, key);
-		else
-			throw out_of_range("Index out of range");
-
-	if (key > root->key)
-		if (root->right)
-			return getWithKey(root->right, key);
-		else
-			throw out_of_range("Index out of range");
-
-	return root->data;
-}
-
-template<typename dataType>
-void Tree<dataType>::setWithKey(const int& key, const dataType& data) {
-	setWithKey(this->root, key, data);
-}
-
-template<typename dataType>
-void Tree<dataType>::setWithKey(node*& root, const int& key, const dataType& data) {
-	if (key < root->key)
-		if (root->left)
-			setWithKey(root->left, key, data);
-		else
-			return;
-
-	if (key > root->key)
-		if (root->right)
-			setWithKey(root->right, key, data);
-		else
-			return;
-
-	if (key == root->key)
-		root->data = data;
-}
-
-template<typename dataType>
 ostream& operator<<(ostream& os, Tree<dataType>& tree) {
 	return os << tree.toString();
-}
-
-template<typename dataType>
-dataType& Tree<dataType>::operator[](const int& key) {
-	return getWithKey(key);
 }
 
 #endif // TREE_H

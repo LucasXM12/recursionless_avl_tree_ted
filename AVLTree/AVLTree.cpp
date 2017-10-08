@@ -12,10 +12,11 @@ using namespace std;
 int main() {
 	Tree<int> aux;
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 11; i++)
 		aux.addNode(i, i*i);
 
-	cout << aux;
+	cout << aux << endl << endl;
+	cout << aux.minKey();
 
 	_getch();
 
