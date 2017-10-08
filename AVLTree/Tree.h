@@ -48,6 +48,8 @@ private:
 	node*& addNode(node*&, const int&, const dataType&);
 	node* delWithKey(node*&, const int&);
 
+	bool existsKey(const int&, node* const&) const;
+
 public:
 	Tree();
 	virtual ~Tree();
@@ -58,6 +60,8 @@ public:
 	void delWithKey(const int&);
 
 	int minKey() const;
+
+	bool existsKey(const int&) const;
 
 	template<typename dataType> friend ostream& operator<<(ostream&, const Tree<dataType>&);
 };
@@ -94,9 +98,10 @@ string Tree<dataType>::toString() {
 
 template<class dataType>
 string Tree<dataType>::toString(node* root) {
+	unsigned char* instP;
+
 begin:
 	string* aux = NULL;
-	unsigned char* instP = NULL;
 
 	//if (root->left) {
 	if (!root->left) {
@@ -237,6 +242,36 @@ typename Tree<dataType>::node*& Tree<dataType>::rightRotate(node*& root) {
 }
 
 template<class dataType>
+bool Tree<dataType>::existsKey(const int& key) const {
+	if (!this->root)
+		return false;
+
+	return existsKey(key, this->root);
+}
+
+template<class dataType>
+bool Tree<dataType>::existsKey(const int& key, node* const& root) const {
+	node* aux = root;
+	while (true)
+		if (key == aux->key)
+			return true;
+		else if (key < root->key)
+			if (aux->left) {
+				aux = aux->left;
+			}
+			else {
+				return false;
+			}
+		else
+			if (aux->right) {
+				aux = aux->right;
+			}
+			else {
+				return false;
+			}
+}
+
+template<class dataType>
 typename Tree<dataType>::node*& Tree<dataType>::newNode(const int& key, const dataType& data) const {
 	node* ret = new node();
 
@@ -251,19 +286,45 @@ typename Tree<dataType>::node*& Tree<dataType>::newNode(const int& key, const da
 
 template<typename dataType>
 void Tree<dataType>::addNode(const int& key, const dataType& data) {
+	if (existsKey(key))
+		throw invalid_argument("Key already exists!!!");
+
 	this->root = addNode(this->root, key, data);
 }
 
 template<typename dataType>
 typename Tree<dataType>::node*& Tree<dataType>::addNode(node*& root, const int& key, const dataType& data) {
+begin:
 	//Normal insertion:--------------------------- 
-	if (root == NULL)
-		return newNode(key, data);
+	if (root == NULL) {
+		if (this->callStack.empty())
+			return newNode(key, data);
+		else {
+			this->callStack.push(newNode(key, data));
+
+			goto P1;
+		}
+	}
+
+	this->callStack.push(root);
 
 	if (key < root->key)
-		root->left = addNode(root->left, key, data);
+		root = root->left;
 	else if (key > root->key)
-		root->right = addNode(root->right, key, data);
+		root = root->right;
+
+	goto begin;
+
+P1:
+	node* ret = (node*)this->callStack.top();
+	this->callStack.pop();
+	root = (node*)this->callStack.top();
+	this->callStack.pop();
+
+	if (key < root->key)
+		root->left = ret;
+	else if (key > root->key)
+		root->right = ret;
 
 	//Update height:---------------------------
 	root->height = height_update(root);
@@ -273,29 +334,61 @@ typename Tree<dataType>::node*& Tree<dataType>::addNode(node*& root, const int& 
 
 	//Balance this sub tree:---------------------------
 	//LL Case:
-	if (balance > 1 && key < root->left->key)
-		return rightRotate(root);
+	if (balance > 1 && key < root->left->key) {
+		if (this->callStack.empty())
+			return rightRotate(root);
+		else {
+			this->callStack.push(rightRotate(root));
+
+			goto P1;
+		}
+	}
 
 	//RR Case:
-	if (balance < -1 && key > root->right->key)
-		return leftRotate(root);
+	if (balance < -1 && key > root->right->key) {
+		if (this->callStack.empty())
+			return leftRotate(root);
+		else {
+			this->callStack.push(leftRotate(root));
+
+			goto P1;
+		}
+	}
 
 	//LR Case:
 	if (balance > 1 && key > root->left->key) {
 		root->left = leftRotate(root->left);
 
-		return rightRotate(root);
+		if (this->callStack.empty())
+			return rightRotate(root);
+		else {
+			this->callStack.push(rightRotate(root));
+
+			goto P1;
+		}
 	}
 
 	//RL Case:
 	if (balance < -1 && key < root->right->key) {
 		root->right = rightRotate(root->right);
 
-		return leftRotate(root);
+		if (this->callStack.empty())
+			return leftRotate(root);
+		else {
+			this->callStack.push(leftRotate(root));
+
+			goto P1;
+		}
 	}
 
 	//If is balanced:
-	return root;
+	if (this->callStack.empty())
+		return root;
+	else {
+		this->callStack.push(root);
+
+		goto P1;
+	}
 }
 
 template<typename dataType>
