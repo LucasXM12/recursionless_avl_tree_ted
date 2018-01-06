@@ -1,6 +1,6 @@
 ﻿  AVLTree.cpp
-d:\pd\ted\recursionless_avl_tree_ted\avltree\tree.h(246): warning C4172: returning address of local variable or temporary: y
-d:\pd\ted\recursionless_avl_tree_ted\avltree\tree.h(305): warning C4172: returning address of local variable or temporary: ret
-d:\pd\ted\recursionless_avl_tree_ted\avltree\tree.h(262): warning C4172: returning address of local variable or temporary: x
-  AVLTree.vcxproj -> D:\PD\TED\recursionless_avl_tree_ted\AVLTree\x64\Debug\AVLTree.exe
-  AVLTree.vcxproj -> D:\PD\TED\recursionless_avl_tree_ted\AVLTree\x64\Debug\AVLTree.pdb (Full PDB)
+f:\pd\ted\recursionless_avl_tree_ted\avltree\tree.h(303): warning C4172: returning address of local variable or temporary: ret
+f:\pd\ted\recursionless_avl_tree_ted\avltree\tree.h(260): warning C4172: returning address of local variable or temporary: x
+f:\pd\ted\recursionless_avl_tree_ted\avltree\tree.h(244): warning C4172: returning address of local variable or temporary: y
+  AVLTree.vcxproj -> F:\PD\TED\recursionless_avl_tree_ted\AVLTree\x64\Debug\AVLTree.exe
+  AVLTree.vcxproj -> F:\PD\TED\recursionless_avl_tree_ted\AVLTree\x64\Debug\AVLTree.pdb (Full PDB)

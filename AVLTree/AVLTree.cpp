@@ -12,11 +12,15 @@ using namespace std;
 int main() {
 	Tree<int> aux;
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++) {
+		cout << aux << endl;
 		aux.addNode(i, 0);
+	}
 
 	aux.delWithKey(4);
+	cout << aux << endl;
 	aux.delWithKey(1);
+	cout << aux << endl;
 	aux.delWithKey(3);
 
 	cout << aux << endl;

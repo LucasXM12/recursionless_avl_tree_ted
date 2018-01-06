@@ -47,10 +47,9 @@ private:
 	node*& newNode(const int&, const dataType&) const;
 
 	node*& addNode(node*&, const int&, const dataType&);
-	node* delWlthKey(node*, int);
 
 	bool existsKey(const int&, node* const&) const;
-	node* delWithKey(node*&, const int&);
+	node* delWithkey(node*, int);
 
 public:
 	Tree();
@@ -60,7 +59,6 @@ public:
 
 	void addNode(const int&, const dataType&);
 	void delWithKey(const int&);
-	void delWlthKey(const int&);
 
 	int minKey() const;
 	int maxKey() const;
@@ -414,11 +412,11 @@ P1:
 
 template<typename dataType>
 void Tree<dataType>::delWithKey(const int& key) {
-	this->root = delWithKey(this->root, key);
+	this->root = delWithkey(this->root, key);
 }
 
 template<typename dataType>
-typename Tree<dataType>::node* Tree<dataType>::delWlthKey(node* root, int key) {
+typename Tree<dataType>::node* Tree<dataType>::delWithkey(node* root, int key) {
 	int* keyP;
 
 begin:
@@ -568,74 +566,6 @@ P1:
 template<typename dataType>
 ostream& operator<<(ostream& os, Tree<dataType>& tree) {
 	return os << tree.toString();
-}
-
-template<typename dataType>
-typename Tree<dataType>::node* Tree<dataType>::delWithKey(node*& root, const int& key) {
-	//Normal deletion:---------------------------
-	if (!root)
-		return root;
-	else if (key < root->key) //The node is on the left sub tree:
-		root->left = delWithKey(root->left, key);
-	else if (key > root->key) //The node is on the right sub tree:
-		root->right = delWithKey(root->right, key);
-	else { //The node is the current one:
-		if (!root->left || !root->right) { //One or none children:
-			node* aux = root->left ? root->left : root->right;
-
-			//No child:
-			if (!aux) {
-				aux = root;
-				root = NULL;
-			}
-			else //One child:
-				*root = *aux;
-
-			delete aux;
-		}
-		else { //Two children:
-			node* aux = minKey(root->right);
-
-			root->key = aux->key;
-
-			root->right = delWithKey(root->right, aux->key);
-		}
-	}
-
-	if (!root)
-		return NULL;
-
-	//Update height:---------------------------
-	root->height = height_update(root);
-
-	//Get balance factor:---------------------------
-	int balance = balance_factor(root);
-
-	//Balance this sub tree:---------------------------
-	//LL Case:
-	if (balance > 1 && balance_factor(root->left) >= 0)
-		return rightRotate(root);
-
-	//LR Case:
-	if (balance > 1 && balance_factor(root->left) < 0) {
-		root->left = leftRotate(root->left);
-
-		return rightRotate(root);
-	}
-
-	//RR Case:
-	if (balance < -1 && balance_factor(root->right) <= 0)
-		return leftRotate(root);
-
-	//RL Case:
-	if (balance < -1 && balance_factor(root->right) > 0) {
-		root->right = rightRotate(root->right);
-
-		return leftRotate(root);
-	}
-
-	//If is balanced:
-	return root;
 }
 
 #endif // TREE_H
